@@ -40,7 +40,7 @@ import { WheelModule } from './wheel/wheel.module';
             database: configService.get<string>('DB_NAME'),
             autoLoadEntities: true,
             synchronize: true,
-          };
+          }; 
         }
       },
     }),
