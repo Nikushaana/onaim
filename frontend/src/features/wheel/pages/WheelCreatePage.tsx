@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import type { WheelFormValues } from "@/features/wheel/schemas/wheel.schema";
 import { apiGateway } from "@/shared/api/httpClient";
 import toast from "react-hot-toast";
-import { Container } from "@mui/material";
 import WheelForm from "@/features/wheel/components/WheelForm";
 
 export default function WheelCreatePage() {

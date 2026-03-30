@@ -1,4 +1,3 @@
-import { Container } from "@mui/material";
 import LeaderboardForm from "@/features/leaderboard/components/LeaderboardForm";
 import type { LeaderboardFormValues } from "@/features/leaderboard/schemas/leaderboard.schema";
 import { apiGateway } from "@/shared/api/httpClient";
