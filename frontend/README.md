@@ -21,7 +21,7 @@ Styling             MUI sx prop (primary), Emotion styled (limited use)
 
 4. Getting Started
 
-git clone <repo-url>
+git clone https://github.com/Nikushaana/onaim.git
 cd project
 
 npm install
