@@ -55,6 +55,6 @@ PATCH /wheel/:id
 ფორმებისთვის გამოვიყენე React Hook Form და Zod ერთად.
 ეს მაძლევს:
 
-მაღალ performance-ს (არ ხდება ზედმეტი rerender)
-ცენტრალიზებულ validation-ს
+მაღალ performance-ს (არ ხდება ზედმეტი rerender),
+ცენტრალიზებულ validation-ს და სხვა
 
