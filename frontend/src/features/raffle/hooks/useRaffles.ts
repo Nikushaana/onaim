@@ -6,4 +6,6 @@ export const useRaffles = (params: GetRafflesParams) =>
     useQuery({
         queryKey: ['raffles', params],
         queryFn: () => getRaffles(params),
+        staleTime: 1000 * 60 * 5,
+        gcTime: 1000 * 60 * 30,
     });

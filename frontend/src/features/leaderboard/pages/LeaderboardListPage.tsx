@@ -14,17 +14,21 @@ import {
   Select,
   MenuItem,
   InputLabel,
+  Button,
 } from "@mui/material";
 
-import { useLeaderboards } from "@/features/leaderboard/composables/useLeaderboards";
+import { useLeaderboards } from "@/features/leaderboard/hooks/useLeaderboards";
 import type {
   Leaderboard,
   LeaderboardStatus,
 } from "@/features/leaderboard/types/leaderboard.types";
+import { useNavigate } from "react-router-dom";
+import { FeatureErrorBoundary } from "@/components/error/FeatureErrorBoundary";
 
 type SortOrder = "ASC" | "DESC";
 
-export default function LeaderboardListPage() {
+function LeaderboardListContent() {
+  const navigate = useNavigate();
   const [page, setPage] = useState(0);
   const [limit, setLimit] = useState(10);
   const [status, setStatus] = useState<LeaderboardStatus | undefined>(
@@ -50,25 +54,43 @@ export default function LeaderboardListPage() {
   };
 
   return (
-    <Paper sx={{ p: 2 }}>
+    <Paper sx={{ p: 2, borderRadius: 6 }}>
       {/* filter */}
-      <Box sx={{ mb: 2, width: 200 }}>
-        <FormControl fullWidth size="small">
-          <InputLabel>Status</InputLabel>
-          <Select
-            value={status || ""}
-            label="Status"
-            onChange={(e) => {
-              setPage(0);
-              setStatus(e.target.value || undefined);
-            }}
-          >
-            <MenuItem value="">All</MenuItem>
-            <MenuItem value="draft">Draft</MenuItem>
-            <MenuItem value="active">Active</MenuItem>
-            <MenuItem value="completed">Completed</MenuItem>
-          </Select>
-        </FormControl>
+      <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
+        <Box sx={{ width: 200 }}>
+          <FormControl fullWidth size="small">
+            <InputLabel>Status</InputLabel>
+            <Select
+              value={status || ""}
+              label="Status"
+              onChange={(e) => {
+                setPage(0);
+                setStatus(e.target.value || undefined);
+              }}
+              sx={{
+                borderRadius: 20,
+              }}
+            >
+              <MenuItem value="">All</MenuItem>
+              <MenuItem value="draft">Draft</MenuItem>
+              <MenuItem value="active">Active</MenuItem>
+              <MenuItem value="completed">Completed</MenuItem>
+            </Select>
+          </FormControl>
+        </Box>
+        <Button
+          variant="contained"
+          sx={{
+            backgroundColor: "#06ed6e",
+            "&:hover": {
+              backgroundColor: "#05c85a",
+            },
+            borderRadius: 20,
+          }}
+          onClick={() => navigate("/create-leaderboard")}
+        >
+          Create Leaderboard
+        </Button>
       </Box>
 
       {/* table */}
@@ -84,12 +106,13 @@ export default function LeaderboardListPage() {
             <TableCell>
               <TableSortLabel
                 active={sortBy === "createdAt"}
-                direction={order.toLowerCase() as any}
+                direction={order === "ASC" ? "asc" : "desc"}
                 onClick={() => handleSort("createdAt")}
               >
                 Created At
               </TableSortLabel>
             </TableCell>
+            <TableCell>Actions</TableCell>
           </TableRow>
         </TableHead>
 
@@ -103,7 +126,7 @@ export default function LeaderboardListPage() {
               </TableRow>
             ))
           ) : data?.data?.length ? (
-            data.data.map((lb: any) => (
+            data.data.map((lb: Leaderboard) => (
               <TableRow key={lb.id}>
                 <TableCell>{lb.title}</TableCell>
                 <TableCell>{lb.status}</TableCell>
@@ -111,6 +134,18 @@ export default function LeaderboardListPage() {
                 <TableCell>{lb.scoringType}</TableCell>
                 <TableCell>
                   {new Date(lb.createdAt).toLocaleDateString()}
+                </TableCell>
+                <TableCell>
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    sx={{
+                      borderRadius: 20,
+                    }}
+                    onClick={() => navigate(`/${lb.id}`)}
+                  >
+                    Details
+                  </Button>
                 </TableCell>
               </TableRow>
             ))
@@ -139,5 +174,13 @@ export default function LeaderboardListPage() {
         }}
       />
     </Paper>
+  );
+}
+
+export default function LeaderboardListPage() {
+  return (
+    <FeatureErrorBoundary name="Leaderboard">
+      <LeaderboardListContent />
+    </FeatureErrorBoundary>
   );
 }

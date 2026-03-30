@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { useRaffles } from "@/features/raffle/composables/useRaffles";
-import type { RaffleStatus } from "@/features/raffle/types/raffle.types";
+import { useRaffles } from "@/features/raffle/hooks/useRaffles";
+import type { Raffle, RaffleStatus } from "@/features/raffle/types/raffle.types";
 import {
   Box,
+  Button,
   FormControl,
   InputLabel,
   MenuItem,
@@ -17,8 +18,11 @@ import {
   TableRow,
   TextField,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import { FeatureErrorBoundary } from "@/components/error/FeatureErrorBoundary";
 
-export default function RaffleDirectory() {
+function RaffleListContent() {
+  const navigate = useNavigate();
   const [page, setPage] = useState(0);
   const [limit, setLimit] = useState(10);
   const [status, setStatus] = useState<RaffleStatus | undefined>(undefined);
@@ -35,52 +39,78 @@ export default function RaffleDirectory() {
   });
 
   return (
-    <Paper sx={{ p: 2 }}>
+    <Paper sx={{ p: 2, borderRadius: 6 }}>
       {/* filter */}
-      <Box sx={{ mb: 2, display: "flex", gap: 2, flexWrap: "wrap" }}>
-        <FormControl size="small" sx={{ width: 200 }}>
-          <InputLabel>Status</InputLabel>
-          <Select
-            value={status || ""}
-            label="Status"
+      <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
+        <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
+          <FormControl size="small" sx={{ width: 150 }}>
+            <InputLabel>Status</InputLabel>
+            <Select
+              value={status || ""}
+              label="Status"
+              sx={{ borderRadius: 6 }}
+              onChange={(e) => {
+                setPage(0);
+                setStatus(e.target.value || undefined);
+              }}
+            >
+              <MenuItem value="">All</MenuItem>
+              <MenuItem value="draft">Draft</MenuItem>
+              <MenuItem value="active">Active</MenuItem>
+              <MenuItem value="drawn">Drawn</MenuItem>
+              <MenuItem value="cancelled">Cancelled</MenuItem>
+            </Select>
+          </FormControl>
+
+          {/* Start Date */}
+          <TextField
+            label="Start Date"
+            type="date"
+            size="small"
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                borderRadius: 6,
+              },
+            }}
+            InputLabelProps={{ shrink: true }}
+            value={startDate}
             onChange={(e) => {
               setPage(0);
-              setStatus(e.target.value || undefined);
+              setStartDate(e.target.value);
             }}
-          >
-            <MenuItem value="">All</MenuItem>
-            <MenuItem value="draft">Draft</MenuItem>
-            <MenuItem value="active">Active</MenuItem>
-            <MenuItem value="drawn">Drawn</MenuItem>
-            <MenuItem value="cancelled">Cancelled</MenuItem>
-          </Select>
-        </FormControl>
+          />
 
-        {/* Start Date */}
-        <TextField
-          label="Start Date"
-          type="date"
-          size="small"
-          InputLabelProps={{ shrink: true }}
-          value={startDate}
-          onChange={(e) => {
-            setPage(0);
-            setStartDate(e.target.value);
+          {/* End Date */}
+          <TextField
+            label="End Date"
+            type="date"
+            size="small"
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                borderRadius: 6,
+              },
+            }}
+            InputLabelProps={{ shrink: true }}
+            value={endDate}
+            onChange={(e) => {
+              setPage(0);
+              setEndDate(e.target.value);
+            }}
+          />
+        </Box>
+        <Button
+          variant="contained"
+          sx={{
+            backgroundColor: "#06ed6e",
+            "&:hover": {
+              backgroundColor: "#05c85a",
+            },
+            borderRadius: 20,
           }}
-        />
-
-        {/* End Date */}
-        <TextField
-          label="End Date"
-          type="date"
-          size="small"
-          InputLabelProps={{ shrink: true }}
-          value={endDate}
-          onChange={(e) => {
-            setPage(0);
-            setEndDate(e.target.value);
-          }}
-        />
+          onClick={() => navigate("/raffles/create-raffle")}
+        >
+          Create raffle
+        </Button>
       </Box>
 
       {/* table */}
@@ -92,6 +122,7 @@ export default function RaffleDirectory() {
             <TableCell>Max Tickets Per User</TableCell>
             <TableCell>Ticket Price</TableCell>
             <TableCell>Created At</TableCell>
+            <TableCell>Actions</TableCell>
           </TableRow>
         </TableHead>
 
@@ -105,7 +136,7 @@ export default function RaffleDirectory() {
               </TableRow>
             ))
           ) : data?.data?.length ? (
-            data.data.map((lb: any) => (
+            data.data.map((lb: Raffle) => (
               <TableRow key={lb.id}>
                 <TableCell>{lb.name}</TableCell>
                 <TableCell>{lb.status}</TableCell>
@@ -113,6 +144,18 @@ export default function RaffleDirectory() {
                 <TableCell>{lb.ticketPrice}</TableCell>
                 <TableCell>
                   {new Date(lb.createdAt).toLocaleDateString()}
+                </TableCell>
+                <TableCell>
+                  <Button
+                    size="small"
+                    sx={{
+                      borderRadius: 20,
+                    }}
+                    variant="outlined"
+                    onClick={() => navigate(`/raffles/${lb.id}`)}
+                  >
+                    Details
+                  </Button>
                 </TableCell>
               </TableRow>
             ))
@@ -139,5 +182,13 @@ export default function RaffleDirectory() {
         }}
       />
     </Paper>
+  );
+}
+
+export default function RaffleDirectory() {
+  return (
+    <FeatureErrorBoundary name="Raffle">
+      <RaffleListContent />
+    </FeatureErrorBoundary>
   );
 }

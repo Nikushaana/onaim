@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { useWheels } from "@/features/wheel/composables/useWheels";
-import type { WheelStatus } from "@/features/wheel/types/wheel.types";
+import { useWheels } from "@/features/wheel/hooks/useWheels";
+import type { Wheel, WheelStatus } from "@/features/wheel/types/wheel.types";
 import {
   Box,
+  Button,
   FormControl,
   InputLabel,
   MenuItem,
@@ -16,8 +17,11 @@ import {
   TablePagination,
   TableRow,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import { FeatureErrorBoundary } from "@/components/error/FeatureErrorBoundary";
 
-export default function WheelListPage() {
+function WheelListContent() {
+  const navigate = useNavigate();
   const [page, setPage] = useState(0);
   const [limit, setLimit] = useState(10);
   const [status, setStatus] = useState<WheelStatus | undefined>(undefined);
@@ -29,25 +33,43 @@ export default function WheelListPage() {
   });
 
   return (
-    <Paper sx={{ p: 2 }}>
+    <Paper sx={{ p: 2, borderRadius: 6 }}>
       {/* filter */}
-      <Box sx={{ mb: 2, width: 200 }}>
-        <FormControl fullWidth size="small">
-          <InputLabel>Status</InputLabel>
-          <Select
-            value={status || ""}
-            label="Status"
-            onChange={(e) => {
-              setPage(0);
-              setStatus(e.target.value || undefined);
-            }}
-          >
-            <MenuItem value="">All</MenuItem>
-            <MenuItem value="draft">Draft</MenuItem>
-            <MenuItem value="active">Active</MenuItem>
-            <MenuItem value="inactive">Inactive</MenuItem>
-          </Select>
-        </FormControl>
+      <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
+        <Box sx={{ width: 200 }}>
+          <FormControl fullWidth size="small">
+            <InputLabel>Status</InputLabel>
+            <Select
+              value={status || ""}
+              label="Status"
+              onChange={(e) => {
+                setPage(0);
+                setStatus(e.target.value || undefined);
+              }}
+              sx={{
+                borderRadius: 20,
+              }}
+            >
+              <MenuItem value="">All</MenuItem>
+              <MenuItem value="draft">Draft</MenuItem>
+              <MenuItem value="active">Active</MenuItem>
+              <MenuItem value="inactive">Inactive</MenuItem>
+            </Select>
+          </FormControl>
+        </Box>
+        <Button
+          variant="contained"
+          sx={{
+            backgroundColor: "#06ed6e",
+            "&:hover": {
+              backgroundColor: "#05c85a",
+            },
+            borderRadius: 20,
+          }}
+          onClick={() => navigate("/wheels/create-wheel")}
+        >
+          Create wheel
+        </Button>
       </Box>
 
       {/* table */}
@@ -59,6 +81,7 @@ export default function WheelListPage() {
             <TableCell>Max Spins Per User</TableCell>
             <TableCell>Spin Cost</TableCell>
             <TableCell>Created At</TableCell>
+            <TableCell>Actions</TableCell>
           </TableRow>
         </TableHead>
 
@@ -72,7 +95,7 @@ export default function WheelListPage() {
               </TableRow>
             ))
           ) : data?.data?.length ? (
-            data.data.map((lb: any) => (
+            data.data.map((lb: Wheel) => (
               <TableRow key={lb.id}>
                 <TableCell>{lb.name}</TableCell>
                 <TableCell>{lb.status}</TableCell>
@@ -80,6 +103,18 @@ export default function WheelListPage() {
                 <TableCell>{lb.spinCost}</TableCell>
                 <TableCell>
                   {new Date(lb.createdAt).toLocaleDateString()}
+                </TableCell>
+                <TableCell>
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    sx={{
+                      borderRadius: 20,
+                    }}
+                    onClick={() => navigate(`/wheels/${lb.id}`)}
+                  >
+                    Details
+                  </Button>
                 </TableCell>
               </TableRow>
             ))
@@ -106,5 +141,13 @@ export default function WheelListPage() {
         }}
       />
     </Paper>
+  );
+}
+
+export default function WheelListPage() {
+  return (
+    <FeatureErrorBoundary name="Wheel">
+      <WheelListContent />
+    </FeatureErrorBoundary>
   );
 }

@@ -6,4 +6,6 @@ export const useWheels = (params: GetWheelsParams) =>
   useQuery({
     queryKey: ['wheels', params],
     queryFn: () => getWheels(params),
+        staleTime: 1000 * 60 * 5,
+        gcTime: 1000 * 60 * 30,
   });

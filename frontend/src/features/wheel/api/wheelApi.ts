@@ -1,5 +1,5 @@
 import { apiGateway } from '@/shared/api/httpClient';
-import type { GetWheelsParams } from '@/features/wheel/types/wheel.types';
+import type { GetWheelsParams, WheelPayload } from '@/features/wheel/types/wheel.types';
 
 export const getWheels = async (params: GetWheelsParams) => {
   const query = new URLSearchParams();
@@ -11,3 +11,18 @@ export const getWheels = async (params: GetWheelsParams) => {
   const res = await apiGateway.get(`/wheels?${query.toString()}`);
   return res.data;
 };
+
+export const createWheel = async (data: WheelPayload) => {
+  const res = await apiGateway.post('/wheels', data);
+  return res.data;
+};
+
+export const getWheelById = async (id: string) => {
+  const res = await apiGateway.get(`/wheels/${id}`);
+  return res.data;
+};
+
+export async function updateWheel(id: string, data: WheelPayload) {
+  const res = await apiGateway.patch(`/wheels/${id}`, data);
+  return res.data;
+}

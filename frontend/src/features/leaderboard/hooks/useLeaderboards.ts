@@ -6,4 +6,6 @@ export const useLeaderboards = (params: GetLeaderboardsParams) =>
     useQuery({
         queryKey: ["leaderboards", params],
         queryFn: () => getLeaderboards(params),
+        staleTime: 1000 * 60 * 5,
+        gcTime: 1000 * 60 * 30,
     });

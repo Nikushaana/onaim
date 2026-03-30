@@ -91,7 +91,7 @@ export default function MainLayout() {
           position="static"
           elevation={0}
           sx={{
-            background: "linear-gradient(90deg, #1976d2, #1565c0)",
+            background: "#06ed6e",
           }}
         >
           <Toolbar
